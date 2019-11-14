@@ -13,7 +13,6 @@ import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import io.socket.engineio.client.transports.WebSocket;
 
 public class SocketIoChatConnection implements IChatConnection {
     private final static String DEBUG = "UaChat";
@@ -40,7 +39,7 @@ public class SocketIoChatConnection implements IChatConnection {
     }
 
     @Override
-    public void connect(final User hello, final IOnConnectionResult result) {
+    public void connect(final User user, final IOnConnectionResult result) {
         Log.v(DEBUG, "Conectando... a http://" + mIp + ":" + mPort);
 
         // Mostrar log
@@ -56,7 +55,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "onConnected");
-                    mSocket.emit(EVENT_USER_HELLO, hello);
+                    mSocket.emit(EVENT_USER_HELLO, user.toJSON());
                     if (result != null) result.onConnected();
                 }
             });
