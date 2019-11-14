@@ -21,7 +21,7 @@ public class SocketIoChatConnection implements IChatConnection {
     private final static String EVENT_SEND_MESSAGE = "sendMessage";
     private final static String EVENT_REQUEST_MESSAGE_LIST = "getMessageList";
     private final static String EVENT_REQUEST_USER_LIST = "getUserList";
-    private final static String ON_EVENT_MESSAGE_LIST_REVEICED = "onMessageListReceived";
+    private final static String ON_EVENT_MESSAGE_LIST_RECEIVED = "onMessageListReceived";
     private final static String ON_EVENT_USER_LIST_RECEIVED = "onUserListReceived";
     private final static String ON_EVENT_MESSAGE_RECEIVED = "onMessageReceived";
 
@@ -76,7 +76,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 }
             });
 
-            mSocket.on(ON_EVENT_MESSAGE_LIST_REVEICED, new Emitter.Listener() {
+            mSocket.on(ON_EVENT_MESSAGE_LIST_RECEIVED, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
                     if(mOnMessageListReceived != null) {
