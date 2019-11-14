@@ -3,13 +3,17 @@ package es.ua.eps.uachat.connection;
 import android.util.Log;
 
 import java.net.URISyntaxException;
+import java.util.logging.Level;
 
 import es.ua.eps.uachat.serverdata.ChatMessage;
 import es.ua.eps.uachat.serverdata.MessageListRequest;
 import es.ua.eps.uachat.serverdata.User;
+import es.ua.eps.uachat.util.AndroidLoggingHandler;
 import io.socket.client.IO;
+import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.engineio.client.transports.WebSocket;
 
 public class SocketIoChatConnection implements IChatConnection {
     private final static String DEBUG = "UaChat";
@@ -38,6 +42,12 @@ public class SocketIoChatConnection implements IChatConnection {
     @Override
     public void connect(final User hello, final IOnConnectionResult result) {
         Log.v(DEBUG, "Conectando... a http://" + mIp + ":" + mPort);
+
+        // Mostrar log
+        AndroidLoggingHandler.reset(new AndroidLoggingHandler());
+        java.util.logging.Logger.getLogger(Socket.class.getName()).setLevel(Level.FINEST);
+        java.util.logging.Logger.getLogger(io.socket.engineio.client.Socket.class.getName()).setLevel(Level.FINEST);
+        java.util.logging.Logger.getLogger(Manager.class.getName()).setLevel(Level.FINEST);
 
         try {
             mSocket = IO.socket("http://" + mIp + ":" + mPort);
