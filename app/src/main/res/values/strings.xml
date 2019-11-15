@@ -1,4 +1,20 @@
 <resources>
     <string name="app_name">UA Chat</string>
     <string name="hint_enter_a_message">Escribe un mensaje</string>
+
+    <string name="welcome_title_01">¡Bienvenido!</string>
+    <string name="welcome_title_02">Diseño bonito</string>
+    <string name="welcome_title_03">Código comprensible</string>
+    <string name="welcome_title_04">Múltiples clientes</string>
+    <string name="welcome_title_05">Conversación cifrada</string>
+    <string name="welcome_title_06">Sistema de baneo</string>
+    <string name="welcome_title_07">Descubrimiento de usuarios</string>
+
+    <string name="welcome_desc_01">Con esta app de chat podrás hacer menos cosas que con otras similares. Pero ha sido desarrollada aquí.</string>
+    <string name="welcome_desc_02">El diseño es totalmente copiado de otras apps similares. ¿Para que reinventar lo que ya funciona?</string>
+    <string name="welcome_desc_03">Puedes ver el código fuente de esta app: bien organizado, comentado y comprensible. ¡Al menos nosotros lo entendemos!</string>
+    <string name="welcome_desc_04">Sería una pena que solo pudieras chatear siempre con la misma persona, ¿verdad?</string>
+    <string name="welcome_desc_05">Un niño de 6 años podría descrifrar las conversaciones. Pero estar cifrada, está.</string>
+    <string name="welcome_desc_06">Si te portas mal te echaremos y no podrás volver a conectarte a nuestro fabuloso chat.</string>
+    <string name="welcome_desc_07">Te mostramos una lista con todos los usuarios disponibles. Incluso los que no conoces.</string>
 </resources>

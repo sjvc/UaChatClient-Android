@@ -1,5 +1,6 @@
 package es.ua.eps.uachat.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import es.ua.eps.uachat.connection.base.data.ChatUser;
 import es.ua.eps.uachat.fragments.BaseChatConnectionFragment;
 import es.ua.eps.uachat.fragments.ChatFragment;
 import es.ua.eps.uachat.fragments.UserListFragment;
+import es.ua.eps.uachat.persistence.SharedPrefs;
 
 public class MainActivity extends AppCompatActivity implements IChatConnectionListener, UserListFragment.OnUserListInteractionListener {
     private IChatConnection mConnection;
@@ -43,8 +45,13 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     protected void onStart() {
         super.onStart();
 
-        mLoadingLayout.setVisibility(View.VISIBLE);
-        mConnection.connect(mUser);
+        // Si aún no se ha introducido el nombre de usuario, abrimos la pantalla de bienvenida
+        if (SharedPrefs.getUserName(this) == null) {
+            startActivity(new Intent(this, WelcomeActivity.class));
+        } else {
+            mLoadingLayout.setVisibility(View.VISIBLE);
+            mConnection.connect(mUser);
+        }
     }
 
     @Override
