@@ -5,7 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+
+import java.util.List;
 
 import es.ua.eps.uachat.R;
 import es.ua.eps.uachat.UaChatApplication;
@@ -17,13 +18,11 @@ import es.ua.eps.uachat.fragments.BaseChatConnectionFragment;
 import es.ua.eps.uachat.fragments.ChatFragment;
 import es.ua.eps.uachat.fragments.UserListFragment;
 
-public class MainActivity extends AppCompatActivity implements IChatConnectionListener {
+public class MainActivity extends AppCompatActivity implements IChatConnectionListener, UserListFragment.OnUserListInteractionListener {
     private IChatConnection mConnection;
     private ChatUser mUser;
 
     private UserListFragment mUserListFragment;
-    private ChatFragment mChatFragment;
-    private BaseChatConnectionFragment mLastFragment;
 
     private ViewGroup mLoadingLayout;
 
@@ -37,7 +36,6 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
         mUser = ((UaChatApplication)getApplication()).getChatUser();
 
         mUserListFragment = UserListFragment.newInstance();
-
         mLoadingLayout = findViewById(R.id.loading_layout);
     }
 
@@ -46,15 +44,11 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
         super.onStart();
 
         mLoadingLayout.setVisibility(View.VISIBLE);
-
-        mConnection.setChatConnectionListener(this);
         mConnection.connect(mUser);
     }
 
     @Override
     protected void onStop() {
-        mLastFragment = getCurrentFragment();
-
         mConnection.setChatConnectionListener(null);
         mConnection.disconnect();
 
@@ -63,10 +57,7 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
 
     @Override
     public void onConnected() {
-        mLoadingLayout.setVisibility(View.INVISIBLE);
 
-        BaseChatConnectionFragment fragment = mLastFragment != null ? mLastFragment : mUserListFragment;
-        showFragment(fragment);
     }
 
     @Override
@@ -80,7 +71,15 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     }
 
     @Override
-    public void onMessageListReceived(ChatMessage[] list) {
+    public void onLoggedIn() {
+        mLoadingLayout.setVisibility(View.INVISIBLE);
+
+        BaseChatConnectionFragment currentFragment = getCurrentFragment();
+        showFragment(currentFragment != null ? currentFragment : mUserListFragment);
+    }
+
+    @Override
+    public void onMessageListReceived(List<ChatMessage> messages) {
 
     }
 
@@ -90,18 +89,25 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     }
 
     @Override
-    public void onUserListReceived(ChatUser[] list) {
+    public void onUserListReceived(List<ChatUser> users) {
 
     }
 
-    private void showChatFragment(String userId, String userName) {
-        ChatFragment fragment = ChatFragment.newInstance(userId, userName);
+    @Override
+    public void onUserListItemClick(ChatUser user) {
+        ChatFragment fragment = ChatFragment.newInstance(user.getId(), user.getName());
         showFragment(fragment);
     }
 
     private void showFragment(BaseChatConnectionFragment fragment) {
+        BaseChatConnectionFragment currentFragment = getCurrentFragment();
+
+        if (currentFragment != fragment) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+        }
+
         mConnection.setChatConnectionListener(fragment);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+        fragment.onStartLoggedIn();
     }
 
     private BaseChatConnectionFragment getCurrentFragment() {

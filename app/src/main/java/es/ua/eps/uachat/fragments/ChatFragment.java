@@ -1,15 +1,32 @@
 package es.ua.eps.uachat.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.stfalcon.chatkit.messages.MessagesList;
+import com.stfalcon.chatkit.messages.MessagesListAdapter;
+
+import java.util.List;
+
+import es.ua.eps.uachat.R;
+import es.ua.eps.uachat.connection.base.data.ChatMessage;
+import es.ua.eps.uachat.connection.base.data.ChatMessageListRequest;
+import es.ua.eps.uachat.connection.base.data.ChatUser;
 
 public class ChatFragment extends BaseChatConnectionFragment {
     private static final String ARG_CHAT_USER_ID = "ARG_CHAT_USER_ID";
     private static final String ARG_CHAT_USER_NAME = "ARG_CHAT_USER_NAME";
 
-    private String mChatUserId;
-    private String mChatUserName;
+    private ChatUser mDstUser;
+
+    private MessagesList mMessagesList;
+    private MessagesListAdapter<ChatMessage> mMessagesAdapter;
+    private long mLastMessageTimestamp = 0;
 
     public ChatFragment() {
        // Los fragments necesitan un constructor vacío público
@@ -35,8 +52,50 @@ public class ChatFragment extends BaseChatConnectionFragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mChatUserId = getArguments().getString(ARG_CHAT_USER_ID);
-            mChatUserName = getArguments().getString(ARG_CHAT_USER_NAME);
+            String id = getArguments().getString(ARG_CHAT_USER_ID);
+            String user = getArguments().getString(ARG_CHAT_USER_NAME);
+
+            mDstUser = new ChatUser(id, user);
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+
+        mMessagesList = view.findViewById(R.id.messagesList);
+
+        return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mMessagesAdapter = new MessagesListAdapter<>(mDstUser.getId(), null);
+        mMessagesList.setAdapter(mMessagesAdapter);
+    }
+
+    @Override
+    public void onStartLoggedIn() {
+        // Al entrar al fragment pedimos la lista de mensajes pendientes al servidor
+        ChatMessageListRequest request = new ChatMessageListRequest(getUser().getId(), mDstUser.getId(), mLastMessageTimestamp);
+        getChatConnection().requestMessageList(request);
+    }
+
+    @Override
+    public void onMessageListReceived(List<ChatMessage> messages) {
+        mMessagesAdapter.addToEnd(messages, false);
+    }
+
+    @Override
+    public void onMessageReceived(ChatMessage message) {
+        super.onMessageReceived(message);
+
+        mMessagesAdapter.addToStart(message, true);
+        if (message.getTimestamp() > mLastMessageTimestamp) {
+            mLastMessageTimestamp = message.getTimestamp();
         }
     }
 }

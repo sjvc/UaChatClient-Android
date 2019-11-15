@@ -1,6 +1,8 @@
 package es.ua.eps.uachat.connection.base.data;
 
-public class ChatUser {
+import com.stfalcon.chatkit.commons.models.IUser;
+
+public class ChatUser implements IUser {
     protected String mId;
     protected String mName;
     protected boolean mIsConnected = false;
@@ -14,12 +16,19 @@ public class ChatUser {
         mName = name;
     }
 
+    @Override
     public String getId() {
         return mId;
     }
 
+    @Override
     public String getName() {
         return mName;
+    }
+
+    @Override
+    public String getAvatar() {
+        return null;
     }
 
     public boolean isConnected() {

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.logging.Level;
 
 import es.ua.eps.uachat.connection.base.IChatConnection;
@@ -26,13 +27,14 @@ import io.socket.emitter.Emitter;
 public class SocketIoChatConnection implements IChatConnection {
     private final static String DEBUG = "UaChat";
 
-    private final static String EVENT_USER_HELLO = "hello";
+    private final static String EVENT_USER_LOGIN = "login";
     private final static String EVENT_SEND_MESSAGE = "sendMessage";
     private final static String EVENT_REQUEST_MESSAGE_LIST = "getMessageList";
     private final static String EVENT_REQUEST_USER_LIST = "getUserList";
     private final static String ON_EVENT_MESSAGE_LIST_RECEIVED = "onMessageListReceived";
     private final static String ON_EVENT_USER_LIST_RECEIVED = "onUserListReceived";
     private final static String ON_EVENT_MESSAGE_RECEIVED = "onMessageReceived";
+    private final static String ON_EVENT_LOGGED_IN = "onLoggedIn";
 
     private WeakReference<Context> mAppContext; // Weak para no causar "Memory leaks" almacenando un Context evitando que se libere
     private Socket mSocket;
@@ -70,7 +72,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "EVENT_CONNECT");
-                    mSocket.emit(EVENT_USER_HELLO, ((JsonChatUser)user).toJSON());
+                    mSocket.emit(EVENT_USER_LOGIN, ((JsonChatUser)user).toJSON());
                     if (mListener != null) mListener.onConnected();
                 }
             });
@@ -95,7 +97,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_MESSAGE_LIST_RECEIVED");
-                    if (mListener != null) mListener.onMessageListReceived((ChatMessage[]) args[0]);
+                    if (mListener != null) mListener.onMessageListReceived((List<ChatMessage>) args[0]);
                 }
             });
 
@@ -103,7 +105,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_USER_LIST_RECEIVED");
-                    if (mListener != null) mListener.onUserListReceived((ChatUser[]) args[0]);
+                    if (mListener != null) mListener.onUserListReceived((List<ChatUser>) args[0]);
                 }
             });
 
@@ -112,6 +114,14 @@ public class SocketIoChatConnection implements IChatConnection {
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_MESSAGE_RECEIVED");
                     if (mListener != null) mListener.onMessageReceived((ChatMessage) args[0]);
+                }
+            });
+
+            mSocket.on(ON_EVENT_LOGGED_IN, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.v(DEBUG, "ON_EVENT_LOGGED_IN");
+                    if (mListener != null) mListener.onLoggedIn();
                 }
             });
 
