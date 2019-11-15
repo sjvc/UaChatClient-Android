@@ -1,19 +1,28 @@
-package es.ua.eps.uachat.connection;
+package es.ua.eps.uachat.connection.socketio;
 
+import android.content.Context;
+import android.provider.Settings;
 import android.util.Log;
 
+import java.lang.ref.WeakReference;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 
-import es.ua.eps.uachat.serverdata.ChatMessage;
-import es.ua.eps.uachat.serverdata.MessageListRequest;
-import es.ua.eps.uachat.serverdata.User;
+import es.ua.eps.uachat.connection.base.IChatConnection;
+import es.ua.eps.uachat.connection.base.IChatConnectionListener;
+import es.ua.eps.uachat.connection.base.data.*;
+import es.ua.eps.uachat.connection.socketio.data.*;
 import es.ua.eps.uachat.util.AndroidLoggingHandler;
 import io.socket.client.IO;
 import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+/*
+    Esta clase implementa los métodos de IChatConnection para que funcione con Socket.IO.
+    El funcionamiento es muy sencillo: Realiza una conexión a una IP y un puerto (un WebSocket), y
+    lo único que hacemos es "traducir" las llamadas y eventos de Socket.IO a IChatConnection
+ */
 public class SocketIoChatConnection implements IChatConnection {
     private final static String DEBUG = "UaChat";
 
@@ -25,22 +34,28 @@ public class SocketIoChatConnection implements IChatConnection {
     private final static String ON_EVENT_USER_LIST_RECEIVED = "onUserListReceived";
     private final static String ON_EVENT_MESSAGE_RECEIVED = "onMessageReceived";
 
+    private WeakReference<Context> mAppContext; // Weak para no causar "Memory leaks" almacenando un Context evitando que se libere
     private Socket mSocket;
     private String mIp;
     private int mPort;
 
-    private IOnMessageListReceivedEvent mOnMessageListReceived;
-    private IOnUserListReceivedEvent mOnUserListReceived;
-    private IOnMessageReceivedEvent mOnMessageReceived;
+    private IChatConnectionListener mListener;
 
-    public SocketIoChatConnection(String ip, int port) {
+    public SocketIoChatConnection(Context context, String ip, int port) {
+        mAppContext = new WeakReference<>(context.getApplicationContext());
         mIp = ip;
         mPort = port;
     }
 
     @Override
-    public void connect(final User user, final IOnConnectionResult result) {
+    public void connect(final ChatUser user) {
         Log.v(DEBUG, "Conectando... a http://" + mIp + ":" + mPort);
+
+        if (isConnected()) {
+            Log.v(DEBUG, "Ya estábamos conectados al servidor");
+            if (mListener != null) mListener.onConnected();
+            return;
+        }
 
         // Mostrar log
         AndroidLoggingHandler.reset(new AndroidLoggingHandler());
@@ -54,52 +69,49 @@ public class SocketIoChatConnection implements IChatConnection {
             mSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.v(DEBUG, "onConnected");
-                    mSocket.emit(EVENT_USER_HELLO, user.toJSON());
-                    if (result != null) result.onConnected();
+                    Log.v(DEBUG, "EVENT_CONNECT");
+                    mSocket.emit(EVENT_USER_HELLO, ((JsonChatUser)user).toJSON());
+                    if (mListener != null) mListener.onConnected();
                 }
             });
 
             mSocket.on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.v(DEBUG, "onError");
-                    if (result != null) result.onError();
+                    Log.v(DEBUG, "EVENT_CONNECT_ERROR");
+                    if (mListener != null) mListener.onConnectionError();
                 }
             });
 
             mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    Log.v(DEBUG, "onConnectTimeout");
-                    if (result != null) result.onTimeOut();
+                    Log.v(DEBUG, "EVENT_CONNECT_TIMEOUT");
+                    if (mListener != null) mListener.onConnectionTimeOut();
                 }
             });
 
             mSocket.on(ON_EVENT_MESSAGE_LIST_RECEIVED, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if(mOnMessageListReceived != null) {
-                        mOnMessageListReceived.onMessageListReceived((ChatMessage[]) args[0]);
-                    }
+                    Log.v(DEBUG, "ON_EVENT_MESSAGE_LIST_RECEIVED");
+                    if (mListener != null) mListener.onMessageListReceived((ChatMessage[]) args[0]);
                 }
             });
 
             mSocket.on(ON_EVENT_USER_LIST_RECEIVED, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if(mOnUserListReceived != null) {
-                        mOnUserListReceived.onUserListReceived((User[]) args[0]);
-                    }
+                    Log.v(DEBUG, "ON_EVENT_USER_LIST_RECEIVED");
+                    if (mListener != null) mListener.onUserListReceived((ChatUser[]) args[0]);
                 }
             });
 
             mSocket.on(ON_EVENT_MESSAGE_RECEIVED, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    if (mOnMessageReceived != null) {
-                        mOnMessageReceived.onMessageReceived((ChatMessage)args[0]);
-                    }
+                    Log.v(DEBUG, "ON_EVENT_MESSAGE_RECEIVED");
+                    if (mListener != null) mListener.onMessageReceived((ChatMessage) args[0]);
                 }
             });
 
@@ -110,34 +122,49 @@ public class SocketIoChatConnection implements IChatConnection {
     }
 
     @Override
+    public boolean isConnected() {
+        return mSocket != null && mSocket.connected();
+    }
+
+    @Override
     public void disconnect() {
-        mSocket.disconnect();
+        if (isConnected()) {
+            mSocket.disconnect();
+        }
     }
 
     @Override
     public void sendMessage(ChatMessage message) {
-        mSocket.emit(EVENT_SEND_MESSAGE, message);
+        if (isConnected()) {
+            mSocket.emit(EVENT_SEND_MESSAGE, message);
+        }
     }
 
     @Override
-    public void requestMessageList(MessageListRequest request, IOnMessageListReceivedEvent callback) {
-        mOnMessageListReceived = callback;
-        mSocket.emit(EVENT_REQUEST_MESSAGE_LIST);
+    public void requestMessageList(ChatMessageListRequest request) {
+        if (isConnected()) {
+            mSocket.emit(EVENT_REQUEST_MESSAGE_LIST);
+        }
     }
 
     @Override
-    public void requestUserList(IOnUserListReceivedEvent callback) {
-        mOnUserListReceived = callback;
-        mSocket.emit(EVENT_REQUEST_USER_LIST, getClientId());
+    public void requestUserList() {
+        if (isConnected()) {
+            mSocket.emit(EVENT_REQUEST_USER_LIST, getClientId());
+        }
     }
 
     @Override
-    public void onMessageReceived(IOnMessageReceivedEvent callback) {
-        mOnMessageReceived = callback;
+    public void setChatConnectionListener(IChatConnectionListener listener) {
+        mListener = listener;
     }
 
     @Override
     public String getClientId() {
-        return "FGSDKJGSDJK";
+        if (mAppContext.get() != null) {
+            return Settings.Secure.getString(mAppContext.get().getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
+
+        return null;
     }
 }
