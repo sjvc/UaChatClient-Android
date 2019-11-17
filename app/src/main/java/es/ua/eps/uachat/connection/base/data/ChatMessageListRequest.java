@@ -5,9 +5,9 @@ package es.ua.eps.uachat.connection.base.data;
  */
 public class ChatMessageListRequest {
 
-    protected String mSrcUserId;
-    protected String mDstUserId;
-    protected long mTimestamp;
+    private String mSrcUserId;
+    private String mDstUserId;
+    private long mTimestamp;
 
     public ChatMessageListRequest() {
 
@@ -29,6 +29,18 @@ public class ChatMessageListRequest {
 
     public long getTimestamp() {
         return mTimestamp;
+    }
+
+    public void setSrcUserId(String userId) {
+        mSrcUserId = userId;
+    }
+
+    public void setDstUserId(String userId) {
+        mDstUserId = userId;
+    }
+
+    public void setTimestamp(long timestamp) {
+        mTimestamp = timestamp;
     }
 
 }

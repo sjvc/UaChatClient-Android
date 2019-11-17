@@ -5,18 +5,17 @@ import org.json.JSONObject;
 
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
-public class JsonChatUser extends ChatUser implements IJsonSerializable<JsonChatUser> {
+public class JsonChatUser {
     private final static String JSON_ID           = "id";
     private final static String JSON_NAME         = "name";
     private final static String JSON_IS_CONNECTED = "isConnected";
 
-    @Override
-    public JSONObject toJSON() {
+    public static JSONObject toJSON(ChatUser chatUser) {
         try{
             JSONObject json = new JSONObject();
-            json.put(JSON_ID, getId());
-            json.put(JSON_NAME, mName);
-            json.put(JSON_IS_CONNECTED, mIsConnected);
+            json.put(JSON_ID, chatUser.getId());
+            json.put(JSON_NAME, chatUser.getName());
+            json.put(JSON_IS_CONNECTED, chatUser.isConnected());
             return json;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -25,16 +24,17 @@ public class JsonChatUser extends ChatUser implements IJsonSerializable<JsonChat
         return null;
     }
 
-    @Override
-    public JsonChatUser fromJSON(JSONObject json) {
+    public static ChatUser fromJSON(JSONObject json) {
+        ChatUser chatUser = new ChatUser();
+
         try{
-            mId = json.getString(JSON_ID);
-            mName = json.getString(JSON_NAME);
-            mIsConnected = json.getBoolean(JSON_IS_CONNECTED);
+            chatUser.setId(json.getString(JSON_ID));
+            chatUser.setName(json.getString(JSON_NAME));
+            chatUser.setIsConnected(json.getBoolean(JSON_IS_CONNECTED));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return this;
+        return chatUser;
     }
 }

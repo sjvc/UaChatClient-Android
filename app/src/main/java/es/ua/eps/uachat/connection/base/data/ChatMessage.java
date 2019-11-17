@@ -11,10 +11,10 @@ import java.util.Date;
     Implementa IMessage para que pueda ser usada con ChatKit
  */
 public class ChatMessage implements IMessage {
-    protected ChatUser mSrcUser;
-    protected ChatUser mDstUser;
-    protected String mMessage;
-    protected long mTimestamp;
+    private ChatUser mSrcUser;
+    private ChatUser mDstUser;
+    private String mMessage;
+    private long mTimestamp;
 
     public ChatMessage() {
         mTimestamp = System.currentTimeMillis();
@@ -55,7 +55,27 @@ public class ChatMessage implements IMessage {
         return mDstUser;
     }
 
+    public String getMessage() {
+        return mMessage;
+    }
+
     public long getTimestamp() {
         return mTimestamp;
+    }
+
+    public void setUser(ChatUser user) {
+        mSrcUser = user;
+    }
+
+    public void setDstUser(ChatUser user) {
+        mDstUser = user;
+    }
+
+    public void setMessage(String message) {
+        mMessage = message;
+    }
+
+    public void setTimestamp(long timestamp) {
+        mTimestamp = timestamp;
     }
 }

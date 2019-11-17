@@ -7,9 +7,9 @@ import com.stfalcon.chatkit.commons.models.IUser;
     Implementa IUser para que pueda ser usada con ChatKit
  */
 public class ChatUser implements IUser {
-    protected String mId;
-    protected String mName;
-    protected boolean mIsConnected = false;
+    private String mId;
+    private String mName;
+    private boolean mIsConnected = false;
 
     public ChatUser() {
 
@@ -37,6 +37,10 @@ public class ChatUser implements IUser {
 
     public boolean isConnected() {
         return mIsConnected;
+    }
+
+    public void setId(String id) {
+        mId = id;
     }
 
     public void setIsConnected(boolean isConnected) {

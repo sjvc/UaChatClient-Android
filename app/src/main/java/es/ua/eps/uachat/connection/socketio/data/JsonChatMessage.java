@@ -2,11 +2,11 @@ package es.ua.eps.uachat.connection.socketio.data;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import es.ua.eps.uachat.connection.base.data.ChatMessage;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
-
-public class JsonChatMessage extends ChatMessage implements IJsonSerializable<JsonChatMessage> {
+public class JsonChatMessage {
     private final static String JSON_SRC_USER_ID          = "srcUserId";
     private final static String JSON_SRC_USER_NAME        = "srcUserName";
     private final static String JSON_DST_USER_ID          = "dstUserId";
@@ -14,16 +14,15 @@ public class JsonChatMessage extends ChatMessage implements IJsonSerializable<Js
     private final static String JSON_MESSAGE              = "message";
     private final static String JSON_TIMESTAMP            = "timestamp";
 
-    @Override
-    public JSONObject toJSON() {
+    public static JSONObject toJSON(ChatMessage chatMessage) {
         try{
             JSONObject json = new JSONObject();
-            json.put(JSON_SRC_USER_ID, mSrcUser.getId());
-            json.put(JSON_SRC_USER_NAME, mSrcUser.getName());
-            json.put(JSON_DST_USER_ID, mDstUser.getId());
-            json.put(JSON_DST_USER_NAME, mDstUser.getName());
-            json.put(JSON_MESSAGE, mMessage);
-            json.put(JSON_TIMESTAMP, mTimestamp);
+            json.put(JSON_SRC_USER_ID, chatMessage.getUser().getId());
+            json.put(JSON_SRC_USER_NAME, chatMessage.getUser().getName());
+            json.put(JSON_DST_USER_ID, chatMessage.getDstUser().getId());
+            json.put(JSON_DST_USER_NAME, chatMessage.getDstUser().getName());
+            json.put(JSON_MESSAGE, chatMessage.getMessage());
+            json.put(JSON_TIMESTAMP, chatMessage.getTimestamp());
             return json;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -32,17 +31,18 @@ public class JsonChatMessage extends ChatMessage implements IJsonSerializable<Js
         return null;
     }
 
-    @Override
-    public JsonChatMessage fromJSON(JSONObject json) {
+    public static ChatMessage fromJSON(JSONObject json) {
+        ChatMessage chatMessage = new ChatMessage();
+
         try{
-            mSrcUser = new ChatUser(json.getString(JSON_SRC_USER_ID), json.getString(JSON_SRC_USER_NAME));
-            mDstUser = new ChatUser(json.getString(JSON_DST_USER_ID), json.getString(JSON_DST_USER_NAME));
-            mMessage = json.getString(JSON_MESSAGE);
-            mTimestamp = json.getLong(JSON_TIMESTAMP);
+            chatMessage.setUser(new ChatUser(json.getString(JSON_SRC_USER_ID), json.getString(JSON_SRC_USER_NAME)));
+            chatMessage.setDstUser(new ChatUser(json.getString(JSON_DST_USER_ID), json.getString(JSON_DST_USER_NAME)));
+            chatMessage.setMessage(json.getString(JSON_MESSAGE));
+            chatMessage.setTimestamp(json.getLong(JSON_TIMESTAMP));
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        return this;
+        return chatMessage;
     }
 }
