@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
-public class JsonChatUser extends ChatUser implements IJsonSerializable {
+public class JsonChatUser extends ChatUser implements IJsonSerializable<JsonChatUser> {
     private final static String JSON_ID           = "id";
     private final static String JSON_NAME         = "name";
     private final static String JSON_IS_CONNECTED = "isConnected";
@@ -15,7 +15,7 @@ public class JsonChatUser extends ChatUser implements IJsonSerializable {
         try{
             JSONObject json = new JSONObject();
             json.put(JSON_ID, getId());
-            json.put(JSON_NAME, getName());
+            json.put(JSON_NAME, mName);
             json.put(JSON_IS_CONNECTED, mIsConnected);
             return json;
         } catch (JSONException e) {
@@ -26,7 +26,7 @@ public class JsonChatUser extends ChatUser implements IJsonSerializable {
     }
 
     @Override
-    public void fromJSON(JSONObject json) {
+    public JsonChatUser fromJSON(JSONObject json) {
         try{
             mId = json.getString(JSON_ID);
             mName = json.getString(JSON_NAME);
@@ -34,5 +34,7 @@ public class JsonChatUser extends ChatUser implements IJsonSerializable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        return this;
     }
 }

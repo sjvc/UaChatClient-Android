@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
@@ -25,6 +26,7 @@ public class ChatFragment extends BaseChatConnectionFragment {
     private ChatUser mDstUser;
 
     private MessagesList mMessagesList;
+    private MessageInput mMessageInput;
     private MessagesListAdapter<ChatMessage> mMessagesAdapter;
     private long mLastMessageTimestamp = 0;
 
@@ -65,6 +67,7 @@ public class ChatFragment extends BaseChatConnectionFragment {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         mMessagesList = view.findViewById(R.id.messagesList);
+        mMessageInput = view.findViewById(R.id.input);
 
         return view;
     }
@@ -75,14 +78,27 @@ public class ChatFragment extends BaseChatConnectionFragment {
 
         mMessagesAdapter = new MessagesListAdapter<>(mDstUser.getId(), null);
         mMessagesList.setAdapter(mMessagesAdapter);
+
+        mMessageInput.setInputListener(mInputListener);
     }
 
     @Override
-    public void onStartLoggedIn() {
+    public void onShownLoggedIn() {
         // Al entrar al fragment pedimos la lista de mensajes pendientes al servidor
         ChatMessageListRequest request = new ChatMessageListRequest(getUser().getId(), mDstUser.getId(), mLastMessageTimestamp);
         getChatConnection().requestMessageList(request);
     }
+
+    private MessageInput.InputListener mInputListener = new MessageInput.InputListener() {
+        @Override
+        public boolean onSubmit(CharSequence input) {
+            ChatMessage message = new ChatMessage(getUser(), mDstUser, input.toString());
+            mMessagesAdapter.addToStart(message, true);
+            getChatConnection().sendMessage(message);
+
+            return true;
+        }
+    };
 
     @Override
     public void onMessageListReceived(List<ChatMessage> messages) {

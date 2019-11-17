@@ -13,6 +13,9 @@ import es.ua.eps.uachat.connection.base.IChatConnectionListener;
 import es.ua.eps.uachat.connection.base.data.ChatMessage;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
+/*
+    Clase base para los fragments que han de interactuar con el servidor.
+ */
 public abstract class BaseChatConnectionFragment extends Fragment implements IChatConnectionListener {
     private IChatConnection mConnection;
     private ChatUser mUser;
@@ -38,7 +41,7 @@ public abstract class BaseChatConnectionFragment extends Fragment implements ICh
 
     }
 
-    public abstract void onStartLoggedIn();
+    public abstract void onShownLoggedIn();
 
     @Override
     public void onConnectionError() {

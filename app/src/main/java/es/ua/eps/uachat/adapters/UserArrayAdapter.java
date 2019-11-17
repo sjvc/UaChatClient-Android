@@ -16,6 +16,11 @@ import java.util.List;
 import es.ua.eps.uachat.R;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
+/*
+    Adapter para mostrar los usuarios conectados al chat en una lista.
+    Usa el patrón ViewHolder para reciclar las vistas y mejorar el rendimiento.
+ */
+
 public class UserArrayAdapter extends ArrayAdapter<ChatUser> {
 
     public UserArrayAdapter(@NonNull Context context, List<ChatUser> users) {

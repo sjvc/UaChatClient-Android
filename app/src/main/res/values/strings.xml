@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">UA Chat</string>
     <string name="hint_enter_a_message">Escribe un mensaje</string>
+    <string name="hint_enter_username">Escribe aquí tu nombre</string>
 
     <string name="welcome_title_01">¡Bienvenido!</string>
     <string name="welcome_title_02">Diseño bonito</string>

@@ -2,6 +2,10 @@ package es.ua.eps.uachat.connection.base.data;
 
 import com.stfalcon.chatkit.commons.models.IUser;
 
+/*
+    Representa un usuario del chat.
+    Implementa IUser para que pueda ser usada con ChatKit
+ */
 public class ChatUser implements IUser {
     protected String mId;
     protected String mName;
@@ -37,5 +41,9 @@ public class ChatUser implements IUser {
 
     public void setIsConnected(boolean isConnected) {
         mIsConnected = isConnected;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 }

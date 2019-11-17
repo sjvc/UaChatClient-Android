@@ -20,6 +20,15 @@ import es.ua.eps.uachat.fragments.ChatFragment;
 import es.ua.eps.uachat.fragments.UserListFragment;
 import es.ua.eps.uachat.persistence.SharedPrefs;
 
+/*
+    Esta activity realiza la conexión al servidor, y loguea al usuario.
+    Una vez que el usuario se ha logueado, muestra un fragment con la lista de usuarios.
+    Al hacer click sobre cualquier usuario, se muestra el fragment del chat con ese usuario.
+    Ambos fragments (lista de usuarios y chat) implementan IChatConnectionListener, por lo que
+    cuando mostremos uno de los fragments, estableceremos ese fragment con listener de eventos de
+    la conexión (IChatConnection) para que sean gestionados por ese fragment.
+ */
+
 public class MainActivity extends AppCompatActivity implements IChatConnectionListener, UserListFragment.OnUserListInteractionListener {
     private IChatConnection mConnection;
     private ChatUser mUser;
@@ -42,12 +51,11 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
 
-        // Si aún no se ha introducido el nombre de usuario, abrimos la pantalla de bienvenida
-        if (SharedPrefs.getUserName(this) == null) {
-            startActivity(new Intent(this, WelcomeActivity.class));
+        if (SharedPrefs.getUserName(MainActivity.this) == null) {
+            startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
         } else {
             mLoadingLayout.setVisibility(View.VISIBLE);
             mConnection.connect(mUser);
@@ -55,11 +63,11 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         mConnection.setChatConnectionListener(null);
         mConnection.disconnect();
 
-        super.onStop();
+        super.onPause();
     }
 
     @Override
@@ -79,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
 
     @Override
     public void onLoggedIn() {
-        mLoadingLayout.setVisibility(View.INVISIBLE);
+        mLoadingLayout.setVisibility(View.GONE);
 
         BaseChatConnectionFragment currentFragment = getCurrentFragment();
         showFragment(currentFragment != null ? currentFragment : mUserListFragment);
@@ -106,6 +114,18 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
         showFragment(fragment);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // Al pulsar atrás, si estamos en el chat, volvemos a la lista
+        if (getCurrentFragment() instanceof ChatFragment) {
+            showFragment(mUserListFragment);
+        }
+    }
+
+    // Muestra el fragment pasado como parámetro, y lo asigna como listener de los eventos de la conexión.
+    // Si ya se estaba mostrando dicho fragment, simplemente lo asignamos como listener de los eventos.
     private void showFragment(BaseChatConnectionFragment fragment) {
         BaseChatConnectionFragment currentFragment = getCurrentFragment();
 
@@ -114,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
         }
 
         mConnection.setChatConnectionListener(fragment);
-        fragment.onStartLoggedIn();
+        fragment.onShownLoggedIn();
     }
 
     private BaseChatConnectionFragment getCurrentFragment() {

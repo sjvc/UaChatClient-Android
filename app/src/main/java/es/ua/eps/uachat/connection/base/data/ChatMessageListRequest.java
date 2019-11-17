@@ -1,5 +1,8 @@
 package es.ua.eps.uachat.connection.base.data;
 
+/*
+    Encapsula una petición al servidor de la lista de usuarios.
+ */
 public class ChatMessageListRequest {
 
     protected String mSrcUserId;

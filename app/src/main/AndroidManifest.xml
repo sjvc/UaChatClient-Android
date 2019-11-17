@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="es.ua.eps.uachat">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".UaChatApplication"
         android:allowBackup="true"
@@ -20,7 +22,5 @@
             </intent-filter>
         </activity>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

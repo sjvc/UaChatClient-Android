@@ -3,6 +3,9 @@ package es.ua.eps.uachat.persistence;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+/*
+    Usamos esta clase para cargar y guardar datos en Shared Preferences
+ */
 public class SharedPrefs {
     private final static String FILE_NAME = "uaChatPrefs";
     private final static String KEY_USER_NAME = "userName";

@@ -6,6 +6,10 @@ import com.stfalcon.chatkit.commons.models.IUser;
 import java.util.Calendar;
 import java.util.Date;
 
+/*
+    Representa un mensaje del chat.
+    Implementa IMessage para que pueda ser usada con ChatKit
+ */
 public class ChatMessage implements IMessage {
     protected ChatUser mSrcUser;
     protected ChatUser mDstUser;

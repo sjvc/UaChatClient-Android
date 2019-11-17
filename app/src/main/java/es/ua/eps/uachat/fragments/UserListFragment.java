@@ -75,14 +75,14 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     }
 
     @Override
-    public void onStartLoggedIn() {
+    public void onShownLoggedIn() {
         // Al entrar al fragment pedimos la lista de usuarios al servidor
         mRequestUserListRunnable.run();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
 
         // Al salir del fragment, dejamos de pedir la lista al servidor
         mHandler.removeCallbacks(mRequestUserListRunnable);

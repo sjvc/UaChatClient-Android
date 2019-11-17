@@ -2,7 +2,10 @@ package es.ua.eps.uachat.connection.socketio.data;
 
 import org.json.JSONObject;
 
-public interface IJsonSerializable {
+/*
+    Interfaz que ha de definir cualquier clase que queramos que sea serializable usando JSON
+ */
+public interface IJsonSerializable<T> {
     JSONObject toJSON();
-    void fromJSON(JSONObject json);
+    T fromJSON(JSONObject json);
 }
