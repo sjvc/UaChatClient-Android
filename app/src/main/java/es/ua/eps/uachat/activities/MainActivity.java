@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
             startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
         } else {
             mLoadingLayout.setVisibility(View.VISIBLE);
+            mConnection.setChatConnectionListener(this);
             mConnection.connect(mUser);
         }
     }
@@ -87,10 +88,15 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
 
     @Override
     public void onLoggedIn() {
-        mLoadingLayout.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mLoadingLayout.setVisibility(View.GONE);
 
-        BaseChatConnectionFragment currentFragment = getCurrentFragment();
-        showFragment(currentFragment != null ? currentFragment : mUserListFragment);
+                BaseChatConnectionFragment currentFragment = getCurrentFragment();
+                showFragment(currentFragment != null ? currentFragment : mUserListFragment);
+            }
+        });
     }
 
     @Override
