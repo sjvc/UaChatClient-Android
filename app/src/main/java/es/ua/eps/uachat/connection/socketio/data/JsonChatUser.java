@@ -5,6 +5,9 @@ import org.json.JSONObject;
 
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
+/**
+ * Esta clase lo único que hace es serializar y deserializar un objeto JsonChatUser
+ */
 public class JsonChatUser {
     private final static String JSON_ID           = "id";
     private final static String JSON_NAME         = "name";

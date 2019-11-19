@@ -5,7 +5,7 @@ import java.util.List;
 import es.ua.eps.uachat.connection.base.data.ChatMessage;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
-/*
+/**
     La clase que implemente IChatConnection podrá comunicarse con cualquier clase
     que implemente IChatConnectionListener llamando a los métodos de esta última.
  */

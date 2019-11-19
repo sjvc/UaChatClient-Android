@@ -19,6 +19,11 @@ import es.ua.eps.uachat.R;
 import es.ua.eps.uachat.adapters.UserArrayAdapter;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
+/**
+ * Este fragment muestra la lista de usuarios del chat, indicando si están o no conectados.
+ * Cuando se muestra este fragment comienza a realizar peticiones de la lista de usuarios
+ * cada REQUEST_LIST_INTERVAL_MILLIS milisegundos, de forma que siempre esté actualizada.
+ */
 public class UserListFragment extends BaseChatConnectionFragment implements AdapterView.OnItemClickListener {
     private final static int REQUEST_LIST_INTERVAL_MILLIS = 5000;
 
@@ -76,9 +81,7 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onResumeLoggedIn() {
         // Al mostrarse el fragment empezamos a pedir la lista de usuarios periódicamente
         mRequestUserListRunnable.run();
     }
@@ -136,6 +139,7 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
         }
     }
 
+    // Interfaz para comunicarnos con la activity que esté usando este fragment
     public interface OnUserListInteractionListener {
         void onUserListItemClick(ChatUser user);
     }

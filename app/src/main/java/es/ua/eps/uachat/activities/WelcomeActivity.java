@@ -13,7 +13,7 @@ import es.ua.eps.uachat.R;
 import es.ua.eps.uachat.UaChatApplication;
 import es.ua.eps.uachat.persistence.SharedPrefs;
 
-/*
+/**
     Mostramos esta Activity al usuario, nada más arrancar la aplicación, la primera vez que la abre.
     De esta forma, le presentamos las características de la misma, y le preguntamos su nombre.
  */

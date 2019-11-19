@@ -20,6 +20,11 @@ import es.ua.eps.uachat.connection.base.data.ChatMessage;
 import es.ua.eps.uachat.connection.base.data.ChatMessageListRequest;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
 
+/**
+ * Este fragment permite recibir y enviar mensajes al servidor, para chatear con otro usuario.
+ * Cuando se muestra el fragment, pediremos una lista al servidor con los mensajes pendientes de leer.
+ * Luego, escucharemos nuevos mensajes, y gestionamos el envío de mensajes.
+ */
 public class ChatFragment extends BaseChatConnectionFragment {
     private static final String ARG_CHAT_USER_ID = "ARG_CHAT_USER_ID";
     private static final String ARG_CHAT_USER_NAME = "ARG_CHAT_USER_NAME";
@@ -83,9 +88,7 @@ public class ChatFragment extends BaseChatConnectionFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onResumeLoggedIn() {
         // Al mostrar el fragment pedimos los mensajes anteriores al servidor
         ChatMessageListRequest request = new ChatMessageListRequest(getUser().getId(), mDstUser.getId(), mLastMessageTimestamp);
         getChatConnection().requestMessageList(request);

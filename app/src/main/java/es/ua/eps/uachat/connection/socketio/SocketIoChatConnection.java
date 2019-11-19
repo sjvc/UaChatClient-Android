@@ -24,7 +24,7 @@ import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-/*
+/**
     Esta clase implementa los métodos de IChatConnection para que funcione con Socket.IO.
     El funcionamiento es muy sencillo: Realiza una conexión a una IP y un puerto (un WebSocket), y
     lo único que hacemos es "traducir" las llamadas y eventos de Socket.IO a IChatConnection
@@ -45,6 +45,7 @@ public class SocketIoChatConnection implements IChatConnection {
     private Socket mSocket;
     private String mIp;
     private int mPort;
+    private boolean mIsLoggedIn; // Indica si el usuario se ha logueado
 
     private ArrayList<IChatConnectionListener> mListeners = new ArrayList<>();
 
@@ -55,7 +56,7 @@ public class SocketIoChatConnection implements IChatConnection {
     }
 
     @Override
-    public void connect(final ChatUser user) {
+    public void connect() {
         Log.v(DEBUG, "Conectando... a http://" + mIp + ":" + mPort);
 
         if (isConnected()) {
@@ -78,7 +79,6 @@ public class SocketIoChatConnection implements IChatConnection {
                 public void call(Object... args) {
                     Log.v(DEBUG, "EVENT_CONNECT");
                     for (IChatConnectionListener listener : mListeners) listener.onConnected();
-                    mSocket.emit(EVENT_USER_LOGIN, (JsonChatUser.toJSON(user)));
                 }
             });
 
@@ -148,7 +148,17 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_LOGGED_IN");
+                    mIsLoggedIn = true;
                     for (IChatConnectionListener listener : mListeners) listener.onLoggedIn();
+                }
+            });
+
+            mSocket.on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.v(DEBUG, "EVENT_DISCONNECT");
+                    mIsLoggedIn = false;
+                    for (IChatConnectionListener listener : mListeners) listener.onDisconnected();
                 }
             });
 
@@ -168,6 +178,19 @@ public class SocketIoChatConnection implements IChatConnection {
         if (isConnected()) {
             mSocket.disconnect();
         }
+    }
+
+    @Override
+    public void login(ChatUser user) {
+        if (isConnected()) {
+            Log.v(DEBUG, "EVENT_USER_LOGIN");
+            mSocket.emit(EVENT_USER_LOGIN, (JsonChatUser.toJSON(user)));
+        }
+    }
+
+    @Override
+    public boolean isLoggedIn() {
+        return isConnected() && mIsLoggedIn;
     }
 
     @Override
