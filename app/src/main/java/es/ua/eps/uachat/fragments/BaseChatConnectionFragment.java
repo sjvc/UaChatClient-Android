@@ -28,6 +28,20 @@ public abstract class BaseChatConnectionFragment extends Fragment implements ICh
         mUser = ((UaChatApplication)getActivity().getApplication()).getChatUser();
     }
 
+    @Override
+    public void onResume() {
+        mConnection.addListener(this);
+
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        mConnection.removeListener(this);
+
+        super.onStop();
+    }
+
     public IChatConnection getChatConnection() {
         return mConnection;
     }
@@ -41,8 +55,6 @@ public abstract class BaseChatConnectionFragment extends Fragment implements ICh
 
     }
 
-    public abstract void onShownLoggedIn();
-
     @Override
     public void onConnectionError() {
 
@@ -55,6 +67,11 @@ public abstract class BaseChatConnectionFragment extends Fragment implements ICh
 
     @Override
     public void onLoggedIn() {
+
+    }
+
+    @Override
+    public void onDisconnected() {
 
     }
 

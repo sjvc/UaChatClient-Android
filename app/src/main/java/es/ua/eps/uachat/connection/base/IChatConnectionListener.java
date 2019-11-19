@@ -15,6 +15,7 @@ public interface IChatConnectionListener {
     void onConnectionError();
     void onConnectionTimeOut();
     void onLoggedIn();
+    void onDisconnected();
 
     // Mensajes recibidos por el servidor
     void onMessageListReceived(List<ChatMessage> messages);

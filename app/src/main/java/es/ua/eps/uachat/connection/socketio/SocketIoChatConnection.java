@@ -46,7 +46,7 @@ public class SocketIoChatConnection implements IChatConnection {
     private String mIp;
     private int mPort;
 
-    private IChatConnectionListener mListener;
+    private ArrayList<IChatConnectionListener> mListeners = new ArrayList<>();
 
     public SocketIoChatConnection(Context context, String ip, int port) {
         mAppContext = new WeakReference<>(context.getApplicationContext());
@@ -60,7 +60,7 @@ public class SocketIoChatConnection implements IChatConnection {
 
         if (isConnected()) {
             Log.v(DEBUG, "Ya estábamos conectados al servidor");
-            if (mListener != null) mListener.onConnected();
+            for (IChatConnectionListener listener : mListeners) listener.onConnected();
             return;
         }
 
@@ -77,8 +77,8 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "EVENT_CONNECT");
+                    for (IChatConnectionListener listener : mListeners) listener.onConnected();
                     mSocket.emit(EVENT_USER_LOGIN, (JsonChatUser.toJSON(user)));
-                    if (mListener != null) mListener.onConnected();
                 }
             });
 
@@ -86,7 +86,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "EVENT_CONNECT_ERROR");
-                    if (mListener != null) mListener.onConnectionError();
+                    for (IChatConnectionListener listener : mListeners) listener.onConnectionError();
                 }
             });
 
@@ -94,7 +94,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "EVENT_CONNECT_TIMEOUT");
-                    if (mListener != null) mListener.onConnectionTimeOut();
+                    for (IChatConnectionListener listener : mListeners) listener.onConnectionTimeOut();
                 }
             });
 
@@ -113,7 +113,7 @@ public class SocketIoChatConnection implements IChatConnection {
                         }
                     }
 
-                    if (mListener != null) mListener.onMessageListReceived(messages);
+                    for (IChatConnectionListener listener : mListeners) listener.onMessageListReceived(messages);
                 }
             });
 
@@ -131,7 +131,7 @@ public class SocketIoChatConnection implements IChatConnection {
                             e.printStackTrace();
                         }
                     }
-                    if (mListener != null) mListener.onUserListReceived(users);
+                    for (IChatConnectionListener listener : mListeners) listener.onUserListReceived(users);
                 }
             });
 
@@ -140,7 +140,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_MESSAGE_RECEIVED");
                     ChatMessage message = JsonChatMessage.fromJSON((JSONObject)args[0]);
-                    if (mListener != null) mListener.onMessageReceived(message);
+                    for (IChatConnectionListener listener : mListeners) listener.onMessageReceived(message);
                 }
             });
 
@@ -148,7 +148,7 @@ public class SocketIoChatConnection implements IChatConnection {
                 @Override
                 public void call(Object... args) {
                     Log.v(DEBUG, "ON_EVENT_LOGGED_IN");
-                    if (mListener != null) mListener.onLoggedIn();
+                    for (IChatConnectionListener listener : mListeners) listener.onLoggedIn();
                 }
             });
 
@@ -173,6 +173,7 @@ public class SocketIoChatConnection implements IChatConnection {
     @Override
     public void sendMessage(ChatMessage message) {
         if (isConnected()) {
+            Log.v(DEBUG, "EVENT_SEND_MESSAGE");
             mSocket.emit(EVENT_SEND_MESSAGE, (JsonChatMessage.toJSON(message)));
         }
     }
@@ -180,6 +181,7 @@ public class SocketIoChatConnection implements IChatConnection {
     @Override
     public void requestMessageList(ChatMessageListRequest request) {
         if (isConnected()) {
+            Log.v(DEBUG, "EVENT_REQUEST_MESSAGE_LIST");
             mSocket.emit(EVENT_REQUEST_MESSAGE_LIST, JsonChatMessageListRequest.toJSON(request));
         }
     }
@@ -187,13 +189,21 @@ public class SocketIoChatConnection implements IChatConnection {
     @Override
     public void requestUserList() {
         if (isConnected()) {
+            Log.v(DEBUG, "EVENT_REQUEST_USER_LIST");
             mSocket.emit(EVENT_REQUEST_USER_LIST, getClientId());
         }
     }
 
     @Override
-    public void setChatConnectionListener(IChatConnectionListener listener) {
-        mListener = listener;
+    public void addListener(IChatConnectionListener listener) {
+        if (!mListeners.contains(listener)) {
+            mListeners.add(listener);
+        }
+    }
+
+    @Override
+    public void removeListener(IChatConnectionListener listener) {
+        mListeners.remove(listener);
     }
 
     @Override

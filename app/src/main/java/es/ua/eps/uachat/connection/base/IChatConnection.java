@@ -16,6 +16,7 @@ public interface IChatConnection {
     void sendMessage(ChatMessage message);
     void requestMessageList(ChatMessageListRequest request);
     void requestUserList();
-    void setChatConnectionListener(IChatConnectionListener listener);
+    void addListener(IChatConnectionListener listener);
+    void removeListener(IChatConnectionListener listener);
     String getClientId();
 }

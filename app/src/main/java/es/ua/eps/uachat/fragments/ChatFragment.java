@@ -1,6 +1,7 @@
 package es.ua.eps.uachat.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,15 +77,16 @@ public class ChatFragment extends BaseChatConnectionFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mMessagesAdapter = new MessagesListAdapter<>(mDstUser.getId(), null);
+        mMessagesAdapter = new MessagesListAdapter<>(getUser().getId(), null);
         mMessagesList.setAdapter(mMessagesAdapter);
-
         mMessageInput.setInputListener(mInputListener);
     }
 
     @Override
-    public void onShownLoggedIn() {
-        // Al entrar al fragment pedimos la lista de mensajes pendientes al servidor
+    public void onResume() {
+        super.onResume();
+
+        // Al mostrar el fragment pedimos los mensajes anteriores al servidor
         ChatMessageListRequest request = new ChatMessageListRequest(getUser().getId(), mDstUser.getId(), mLastMessageTimestamp);
         getChatConnection().requestMessageList(request);
     }
@@ -101,17 +103,33 @@ public class ChatFragment extends BaseChatConnectionFragment {
     };
 
     @Override
-    public void onMessageListReceived(List<ChatMessage> messages) {
-        mMessagesAdapter.addToEnd(messages, false);
+    public void onMessageListReceived(final List<ChatMessage> messages) {
+        super.onMessageListReceived(messages);
+
+        if (getActivity() == null || !isAdded()) return;
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessagesAdapter.addToEnd(messages, false);
+            }
+        });
     }
 
     @Override
-    public void onMessageReceived(ChatMessage message) {
+    public void onMessageReceived(final ChatMessage message) {
         super.onMessageReceived(message);
 
-        mMessagesAdapter.addToStart(message, true);
-        if (message.getTimestamp() > mLastMessageTimestamp) {
-            mLastMessageTimestamp = message.getTimestamp();
-        }
+        if (getActivity() == null || !isAdded()) return;
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mMessagesAdapter.addToStart(message, true);
+                if (message.getTimestamp() > mLastMessageTimestamp) {
+                    mLastMessageTimestamp = message.getTimestamp();
+                }
+            }
+        });
     }
 }

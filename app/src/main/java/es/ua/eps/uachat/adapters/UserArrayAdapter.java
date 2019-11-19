@@ -50,7 +50,7 @@ public class UserArrayAdapter extends ArrayAdapter<ChatUser> {
         viewHolder.mStatusImageView.setImageResource(user.isConnected() ? R.drawable.user_connected : R.drawable.user_disconnected);
 
 
-        return super.getView(position, convertView, parent);
+        return convertView;
     }
 
     private static class ViewHolder {

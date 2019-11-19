@@ -3,6 +3,7 @@ package es.ua.eps.uachat.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,8 +76,10 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     }
 
     @Override
-    public void onShownLoggedIn() {
-        // Al entrar al fragment pedimos la lista de usuarios al servidor
+    public void onResume() {
+        super.onResume();
+
+        // Al mostrarse el fragment empezamos a pedir la lista de usuarios periódicamente
         mRequestUserListRunnable.run();
     }
 
@@ -84,7 +87,7 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     public void onPause() {
         super.onPause();
 
-        // Al salir del fragment, dejamos de pedir la lista al servidor
+        // Al ocultar el fragment, dejamos de pedir la lista al servidor
         mHandler.removeCallbacks(mRequestUserListRunnable);
     }
 
@@ -99,24 +102,31 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     };
 
     @Override
-    public void onUserListReceived(List<ChatUser> users) {
+    public void onUserListReceived(final List<ChatUser> users) {
         super.onUserListReceived(users);
 
-        // Si cuando se ejecuta este callback, ya no está activo el fragment, no hacemos nada
-        if (!isAdded() || getContext() == null) return;
+        if (getActivity() == null) return;
 
-        // Mostrar usuarios en la lista
-        if (mListAdapter == null) {
-            mListAdapter = new UserArrayAdapter(getContext(), users);
-            mListView.setAdapter(mListAdapter);
-        } else {
-            mListAdapter.clear();
-            mListAdapter.addAll(users);
-            mListAdapter.notifyDataSetChanged();
-        }
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Si cuando se ejecuta este callback, ya no está activo el fragment, no hacemos nada
+                if (!isAdded() || getContext() == null) return;
 
-        // Programar siguiente petición de lista para que la lista siempre esté actualizada
-        mHandler.postDelayed(mRequestUserListRunnable, REQUEST_LIST_INTERVAL_MILLIS);
+                // Mostrar usuarios en la lista
+                if (mListAdapter == null) {
+                    mListAdapter = new UserArrayAdapter(getContext(), users);
+                    mListView.setAdapter(mListAdapter);
+                } else {
+                    mListAdapter.clear();
+                    mListAdapter.addAll(users);
+                    mListAdapter.notifyDataSetChanged();
+                }
+
+                // Programar siguiente petición de lista para que la lista siempre esté actualizada
+                mHandler.postDelayed(mRequestUserListRunnable, REQUEST_LIST_INTERVAL_MILLIS);
+            }
+        });
     }
 
     @Override

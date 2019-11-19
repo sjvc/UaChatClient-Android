@@ -33,8 +33,6 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     private IChatConnection mConnection;
     private ChatUser mUser;
 
-    private UserListFragment mUserListFragment;
-
     private ViewGroup mLoadingLayout;
 
     @Override
@@ -46,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
         mConnection = ((UaChatApplication)getApplication()).getChatConnection();
         mUser = ((UaChatApplication)getApplication()).getChatUser();
 
-        mUserListFragment = UserListFragment.newInstance();
         mLoadingLayout = findViewById(R.id.loading_layout);
     }
 
@@ -58,15 +55,16 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
             startActivity(new Intent(MainActivity.this, WelcomeActivity.class));
         } else {
             mLoadingLayout.setVisibility(View.VISIBLE);
-            mConnection.setChatConnectionListener(this);
+            mConnection.addListener(this);
             mConnection.connect(mUser);
         }
     }
 
     @Override
     protected void onPause() {
-        mConnection.setChatConnectionListener(null);
+        mConnection.removeListener(this);
         mConnection.disconnect();
+        onDisconnected(); // Llamo yo al método del listener porque no quiero esperar a que el servidor me avise que he desconectado, y además ya he quitado el listener arriba
 
         super.onPause();
     }
@@ -94,9 +92,15 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
                 mLoadingLayout.setVisibility(View.GONE);
 
                 BaseChatConnectionFragment currentFragment = getCurrentFragment();
-                showFragment(currentFragment != null ? currentFragment : mUserListFragment);
+                showFragment(currentFragment != null ? currentFragment : UserListFragment.newInstance());
             }
         });
+    }
+
+    @Override
+    public void onDisconnected() {
+        // Si me desconecto del servidor, quito el fragment que esté activo
+        removeCurrentFragment();
     }
 
     @Override
@@ -122,25 +126,26 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
         // Al pulsar atrás, si estamos en el chat, volvemos a la lista
         if (getCurrentFragment() instanceof ChatFragment) {
-            showFragment(mUserListFragment);
+            showFragment(UserListFragment.newInstance());
+        } else {
+            super.onBackPressed();
         }
     }
 
     // Muestra el fragment pasado como parámetro, y lo asigna como listener de los eventos de la conexión.
     // Si ya se estaba mostrando dicho fragment, simplemente lo asignamos como listener de los eventos.
     private void showFragment(BaseChatConnectionFragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+    }
+
+    private void removeCurrentFragment() {
         BaseChatConnectionFragment currentFragment = getCurrentFragment();
 
-        if (currentFragment != fragment) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+        if (currentFragment != null) {
+            getSupportFragmentManager().beginTransaction().remove(getCurrentFragment()).commit();
         }
-
-        mConnection.setChatConnectionListener(fragment);
-        fragment.onShownLoggedIn();
     }
 
     private BaseChatConnectionFragment getCurrentFragment() {
