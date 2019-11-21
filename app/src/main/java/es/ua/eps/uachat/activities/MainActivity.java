@@ -111,8 +111,8 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
             @Override
             public void run() {
                 new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("BOOM!")
-                    .setMessage("Te has portado mal. Has sido baneado del servidor")
+                    .setTitle(R.string.banned_title)
+                    .setMessage(R.string.banned_message)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {

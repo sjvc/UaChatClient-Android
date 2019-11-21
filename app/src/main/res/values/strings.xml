@@ -18,4 +18,7 @@
     <string name="welcome_desc_05">Un niño de 6 años podría descrifrar las conversaciones. Pero estar cifrada, está.</string>
     <string name="welcome_desc_06">Si te portas mal te echaremos y no podrás volver a conectarte a nuestro fabuloso chat.</string>
     <string name="welcome_desc_07">Te mostramos una lista con todos los usuarios disponibles. Incluso los que no conoces.</string>
+
+    <string name="banned_title">¡¡BOOM!!</string>
+    <string name="banned_message">Te has portado mal. Has sido baneado del servidor</string>
 </resources>
