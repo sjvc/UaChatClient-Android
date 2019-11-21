@@ -5,6 +5,7 @@ import org.json.JSONObject;
 
 import es.ua.eps.uachat.connection.base.data.ChatMessage;
 import es.ua.eps.uachat.connection.base.data.ChatUser;
+import es.ua.eps.uachat.util.Encryption;
 
 /**
  * Esta clase lo único que hace es serializar y deserializar un objeto ChatMessage
@@ -24,7 +25,7 @@ public class JsonChatMessage {
             json.put(JSON_SRC_USER_NAME, chatMessage.getUser().getName());
             json.put(JSON_DST_USER_ID, chatMessage.getDstUser().getId());
             json.put(JSON_DST_USER_NAME, chatMessage.getDstUser().getName());
-            json.put(JSON_MESSAGE, chatMessage.getMessage());
+            json.put(JSON_MESSAGE, Encryption.encrypt(chatMessage.getMessage()));
             json.put(JSON_TIMESTAMP, chatMessage.getTimestamp());
             return json;
         } catch (JSONException e) {
@@ -40,7 +41,7 @@ public class JsonChatMessage {
         try{
             chatMessage.setUser(new ChatUser(json.getString(JSON_SRC_USER_ID), json.getString(JSON_SRC_USER_NAME)));
             chatMessage.setDstUser(new ChatUser(json.getString(JSON_DST_USER_ID), json.getString(JSON_DST_USER_NAME)));
-            chatMessage.setMessage(json.getString(JSON_MESSAGE));
+            chatMessage.setMessage(Encryption.decrypt(json.getString(JSON_MESSAGE)));
             chatMessage.setTimestamp(json.getLong(JSON_TIMESTAMP));
         } catch (JSONException e) {
             e.printStackTrace();
