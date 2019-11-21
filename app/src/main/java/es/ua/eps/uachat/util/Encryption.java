@@ -10,7 +10,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Esta clase gestiona el cifrado de Strings.
- * Alguien
+ * Alguien que decompile esta aplicación podría ver la clave, por lo que un atacante
+ * podría desencriptar los mensajes si los capturara "escuchando" la red.
+ *
+ * Lo correcto sería usar una clave simétrica que solo conocieran los dos usuarios. Ni siquiera
+ * el servidor debe conocer las claves. Para ello podríamos usar el algoritmo Diffie-Hellman
+ * tal y como se explica aquí: https://www.geeksforgeeks.org/implementation-diffie-hellman-algorithm
  */
 public class Encryption{
     private static final byte[] SEED = "NoLoDigasANadie.".getBytes();
