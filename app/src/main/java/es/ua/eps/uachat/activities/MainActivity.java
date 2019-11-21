@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
                         public void onClick(DialogInterface dialogInterface, int i) {
                             MainActivity.this.finish();
                         }
-                    });
+                    }).show();
             }
         });
     }

@@ -1,9 +1,6 @@
 package es.ua.eps.uachat.util;
 
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.util.Base64;
 
 import java.security.Key;
@@ -11,6 +8,10 @@ import java.security.Key;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * Esta clase gestiona el cifrado de Strings.
+ * Alguien
+ */
 public class Encryption{
     private static final byte[] SEED = "NoLoDigasANadie.".getBytes();
 
