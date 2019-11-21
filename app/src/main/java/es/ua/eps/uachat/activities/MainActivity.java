@@ -164,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
     // Si ya se estaba mostrando dicho fragment, simplemente lo asignamos como listener de los eventos.
     private void showFragment(BaseChatConnectionFragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_layout, fragment).commit();
+
+        // Establecer título de la Activity según el fragment mostrado
+        if (fragment instanceof ChatFragment) {
+            setTitle(((ChatFragment) fragment).getDstUserName());
+        } else {
+            setTitle(R.string.app_name);
+        }
     }
 
     // Obtiene el fragment que se está mostrando ahora mismo

@@ -1,8 +1,6 @@
 package es.ua.eps.uachat.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,17 +55,6 @@ public class ChatFragment extends BaseChatConnectionFragment {
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        getActivity().setTitle(R.string.app_name);
-    }
-
-    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -93,8 +80,6 @@ public class ChatFragment extends BaseChatConnectionFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        getActivity().setTitle(mDstUser.getName());
 
         mMessagesAdapter = new MessagesListAdapter<>(getUser().getId(), null);
         mMessagesList.setAdapter(mMessagesAdapter);
@@ -148,5 +133,13 @@ public class ChatFragment extends BaseChatConnectionFragment {
                 }
             }
         });
+    }
+
+    public String getDstUserId() {
+        return getArguments() == null ? "" : getArguments().getString(ARG_CHAT_USER_ID);
+    }
+
+    public String getDstUserName() {
+        return getArguments() == null ? "" :  getArguments().getString(ARG_CHAT_USER_NAME);
     }
 }
