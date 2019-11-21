@@ -88,6 +88,11 @@ public abstract class BaseChatConnectionFragment extends Fragment implements ICh
     }
 
     @Override
+    public void onBanned() {
+
+    }
+
+    @Override
     public void onDisconnected() {
 
     }

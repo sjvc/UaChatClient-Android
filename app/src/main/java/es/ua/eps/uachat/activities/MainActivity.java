@@ -1,10 +1,12 @@
 package es.ua.eps.uachat.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
@@ -99,6 +101,24 @@ public class MainActivity extends AppCompatActivity implements IChatConnectionLi
                 // Y mostramos el fragment que estuviera visible anteriormente (la lista de usuarios si no hubiera ninguno)
                 BaseChatConnectionFragment currentFragment = getCurrentFragment();
                 showFragment(currentFragment != null ? currentFragment : UserListFragment.newInstance());
+            }
+        });
+    }
+
+    @Override
+    public void onBanned() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(MainActivity.this)
+                    .setTitle("BOOM!")
+                    .setMessage("Te has portado mal. Has sido baneado del servidor")
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            MainActivity.this.finish();
+                        }
+                    });
             }
         });
     }

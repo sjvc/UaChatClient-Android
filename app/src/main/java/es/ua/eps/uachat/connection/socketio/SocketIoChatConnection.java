@@ -40,6 +40,7 @@ public class SocketIoChatConnection implements IChatConnection {
     private final static String ON_EVENT_USER_LIST_RECEIVED = "onUserListReceived";
     private final static String ON_EVENT_MESSAGE_RECEIVED = "onMessageReceived";
     private final static String ON_EVENT_LOGGED_IN = "onLoggedIn";
+    private final static String ON_EVENT_BANNED = "onBanned";
 
     private WeakReference<Context> mAppContext; // Weak para no causar "Memory leaks" almacenando un Context evitando que se libere
     private Socket mSocket;
@@ -150,6 +151,14 @@ public class SocketIoChatConnection implements IChatConnection {
                     Log.v(DEBUG, "ON_EVENT_LOGGED_IN");
                     mIsLoggedIn = true;
                     for (IChatConnectionListener listener : mListeners) listener.onLoggedIn();
+                }
+            });
+
+            mSocket.on(ON_EVENT_BANNED, new Emitter.Listener() {
+                @Override
+                public void call(Object... args) {
+                    Log.v(DEBUG, "ON_EVENT_BANNED");
+                    for (IChatConnectionListener listener : mListeners) listener.onBanned();
                 }
             });
 
