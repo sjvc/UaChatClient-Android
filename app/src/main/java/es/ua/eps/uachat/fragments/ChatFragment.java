@@ -114,7 +114,7 @@ public class ChatFragment extends BaseChatConnectionFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessagesAdapter.addToEnd(messages, false);
+                mMessagesAdapter.addToEnd(messages, true);
             }
         });
     }
