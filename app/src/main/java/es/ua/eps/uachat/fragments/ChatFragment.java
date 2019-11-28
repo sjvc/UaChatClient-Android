@@ -1,6 +1,7 @@
 package es.ua.eps.uachat.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,6 +94,7 @@ public class ChatFragment extends BaseChatConnectionFragment {
         getChatConnection().requestMessageList(request);
     }
 
+    // Listener del campo input para enviar mensajes
     private MessageInput.InputListener mInputListener = new MessageInput.InputListener() {
         @Override
         public boolean onSubmit(CharSequence input) {
@@ -104,25 +106,39 @@ public class ChatFragment extends BaseChatConnectionFragment {
         }
     };
 
+    // Este método se ejecuta cuando recibo la lista de mensajes pendientes del usuario con el que estoy hablando
     @Override
     public void onMessageListReceived(final List<ChatMessage> messages) {
         super.onMessageListReceived(messages);
 
-        if (getActivity() == null || !isAdded()) return;
+        // Compruebo que la persona con la que estoy hablando sea el destinatario o el emisor del mensaje
+        if (messages.size() == 0 ||
+                (!messages.get(0).getUser().getId().equals(getDstUserId()) &&
+                 !messages.get(0).getDstUser().getId().equals(getDstUserId())
+                ) ||
+                getActivity() == null || !isAdded()) return;
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mMessagesAdapter.addToEnd(messages, true);
+
+                for (int i=0; i<messages.size(); i++) {
+                    if (messages.get(i).getTimestamp() > mLastMessageTimestamp) {
+                        mLastMessageTimestamp = messages.get(i).getTimestamp();
+                    }
+                }
             }
         });
     }
 
+    // Eeste método se ejecuta cuando cualquier usuario me envía un mensaje
     @Override
     public void onMessageReceived(final ChatMessage message) {
         super.onMessageReceived(message);
 
-        if (getActivity() == null || !isAdded()) return;
+        // Si el mensaje que recibo no es del usuario con el que estoy hablando, no lo muestro
+        if (!message.getUser().getId().equals(getDstUserId()) || getActivity() == null || !isAdded()) return;
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
