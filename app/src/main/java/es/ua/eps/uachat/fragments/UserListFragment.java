@@ -3,12 +3,12 @@ package es.ua.eps.uachat.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +28,7 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
     private final static int REQUEST_LIST_INTERVAL_MILLIS = 5000;
 
     private ListView mListView;
+    private TextView mEmptyListTextView;
     private UserArrayAdapter mListAdapter;
     private Handler mHandler;
     private OnUserListInteractionListener mListener;
@@ -68,6 +69,7 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
 
         mListView = view.findViewById(R.id.usersListView);
+        mEmptyListTextView = view.findViewById(R.id.emptyListTextView);
 
         return view;
     }
@@ -125,6 +127,9 @@ public class UserListFragment extends BaseChatConnectionFragment implements Adap
                     mListAdapter.addAll(users);
                     mListAdapter.notifyDataSetChanged();
                 }
+
+                mListView.setVisibility(users.size() > 0 ? View.VISIBLE : View.GONE);
+                mEmptyListTextView.setVisibility(users.size() == 0 ? View.VISIBLE : View.GONE);
 
                 // Programar siguiente petición de lista para que la lista siempre esté actualizada
                 mHandler.postDelayed(mRequestUserListRunnable, REQUEST_LIST_INTERVAL_MILLIS);

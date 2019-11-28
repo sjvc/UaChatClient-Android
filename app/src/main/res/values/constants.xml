@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string  name="connection_ip" translatable="false">192.168.43.224</string>
-    <integer name="connection_port">8080</integer>
+    <string  name="connection_ip" translatable="false">baviux.com</string>
+    <integer name="connection_port">8888</integer>
 </resources>
