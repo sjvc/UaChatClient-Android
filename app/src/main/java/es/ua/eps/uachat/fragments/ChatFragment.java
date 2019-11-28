@@ -121,12 +121,8 @@ public class ChatFragment extends BaseChatConnectionFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessagesAdapter.addToEnd(messages, true);
-
                 for (int i=0; i<messages.size(); i++) {
-                    if (messages.get(i).getTimestamp() > mLastMessageTimestamp) {
-                        mLastMessageTimestamp = messages.get(i).getTimestamp();
-                    }
+                    addMessageToList(messages.get(i));
                 }
             }
         });
@@ -143,12 +139,16 @@ public class ChatFragment extends BaseChatConnectionFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mMessagesAdapter.addToStart(message, true);
-                if (message.getTimestamp() > mLastMessageTimestamp) {
-                    mLastMessageTimestamp = message.getTimestamp();
-                }
+                addMessageToList(message);
             }
         });
+    }
+
+    private void addMessageToList(ChatMessage message) {
+        mMessagesAdapter.addToStart(message, true);
+        if (message.getTimestamp() > mLastMessageTimestamp) {
+            mLastMessageTimestamp = message.getTimestamp();
+        }
     }
 
     public String getDstUserId() {
